@@ -223,7 +223,7 @@ class App {
     <div class="workout__details">
       <span class="workout__icon">🦶🏼</span>
       <span class="workout__value">${workout.cadence}</span>
-      <span class="workout__unit">spm</span>Dom Manip with insertAdha
+      <span class="workout__unit">spm</span>
     </div>
 </li>
     `
