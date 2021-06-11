@@ -74,7 +74,12 @@ class App {
   #workouts = []
 
   constructor() {
+    // Get users position
     this._getPosition()
+    // Get Data from localstorage
+    this._getLocalStorage()
+
+    // Attach eventhandlers
     form.addEventListener('submit', this._newWorkout.bind(this)) //newWorkout is called by a eventlistener. Therefore we have to pass in the this object, otherwise the this keyword in the called function points to the eventlistener and not our app class.
     inputType.addEventListener('change', this._toggleElevationField)
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this))
@@ -104,6 +109,10 @@ class App {
 
     //Handling click on map
     this.#map.on('click', this._showForm.bind(this))
+
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work)
+    })
   }
 
   _showForm(mapE) {
@@ -181,6 +190,8 @@ class App {
 
     // Hide form + clear inputfields
     this._hideForm()
+    // Set local storage to all workouts
+    this._setLocalStorage()
   }
 
   _renderWorkoutMarker(workout) {
@@ -264,7 +275,28 @@ class App {
       },
     })
     // using the method in the workout class vie the public interface to count clicks. As an example how to call the method of our own class
-    workout.click()
+    // The method is disabled here, because once we restore the object from localstorage the prottypechain gets broken.
+    // workout.click()
+  }
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts))
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'))
+    if (!data) return
+    this.#workouts = data
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work)
+      // _renderWorkoutMarker wont work right here, because when we call _getLocalStorage in the constructor the map is not yet loaded. Instead we will call the method later in _loadMap
+      // this._renderWorkoutMarker(work)
+    })
+  }
+
+  // This method never gets called within our code. However it will be contained in the prototype-chain of our app object. We can call this Methd in the console via typing: app.reset()
+
+  reset() {
+    localStorage.removeItem('workouts')
+    location.reload()
   }
 }
 
